@@ -1,0 +1,36 @@
+services:
+  postgres:
+    image: postgres
+    container_name: postgres_recircular
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: recircular-database
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - re_user_network  # Usando a mesma rede
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin_recircular
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@recircular.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "15433:80"
+    depends_on:
+      - postgres
+    networks:
+      - re_user_network 
+
+volumes:
+  postgres_data:
+
+networks:
+  re_user_network:  
+    
