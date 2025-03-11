@@ -1,25 +1,42 @@
-import { Request, Response } from "express";
+import { request, Request, Response } from "express";
 import ItemService from "../service/itemService";
 import ItemDTO from "../model/dto/itemDTO";
 
+
 export default class ItemController {
-  private itemService = new ItemService();
+private itemService = new ItemService();
 
-  public save = async (request: Request, response: Response) => {
+//vai lidar com o salvamento das imagens, também
+public save = async (request: Request, response: Response) => {
     try {
-      const { name, description,category,statusConservation, availability, size } = request.body;
-      
-      
-      const itemDTO = new ItemDTO(name, description,category,statusConservation, availability, size );
+      const { 
+      name,
+      description,
+      category, 
+      statusConservation, 
+      availability, 
+      size} = request.body;
 
-      const result = await this.itemService.save(itemDTO);
-      response.status(201).send(result);
-      console.log(result)
+      const itemDTO = new ItemDTO(name, description, category, statusConservation, availability, size);
+      const newItem = await this.itemService.save(itemDTO);
+  
+      //se o formDate no insominia estiver preenchido com no máximo 5 fotos
+      if (request.files && Array.isArray(request.files)) {
+          const images = request.files.map((file) => ({
+          pictureName: file.filename, // Nome salvo no Multer
+          itemId: newItem.id,
+        }));
+    
+      await this.itemService.saveImages(images);
+      }
+  
+      response.status(201).json(newItem);
     } catch (error) {
-      console.log(error)
+      console.error("Erro ao salvar item:", error);
+      response.status(500).json({ message: "Erro ao salvar o item." });
     }
-  }
-
+  };
+  
   public getAll = async(request:Request, response: Response)=> {
     try {
       
@@ -46,6 +63,10 @@ export default class ItemController {
       response.status(500).json({ message: "Não foi possível deletar o item." });  
     }
   };
+  public deleteAll= async(request: Request, response:Response)=>{
+    const deleteAll= await this.itemService.deleteAll();
+    response.json(deleteAll);
+  }
 
   public updateAvailability = async (request: Request, response: Response) => {
     try {
@@ -69,4 +90,19 @@ export default class ItemController {
       response.status(500).json({ message: "Erro ao atualizar a disponibilidade." });
     }
   };
+
+  public getBySize = async(request:Request, response:Response)=>{
+    const {size}= request.params;
+    const itensSize= await this.itemService.getBySize(size)
+    return response.json(itensSize);
+  }
+
+  public getByConservation = async (request:Request, response:Response)=>{
+    const {statusConservation}= request.params;
+    const itensConservation= await this.itemService.getByConsevation(statusConservation);
+    return response.json(itensConservation);
+  }
+  
+
+ 
 };
