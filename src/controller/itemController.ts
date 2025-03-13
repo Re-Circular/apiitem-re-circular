@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import ItemService from "../service/itemService";
 import ItemDTO from "../model/dto/itemDTO";
-
+import { request } from "node:http";
 
 export default class ItemController {
 private itemService = new ItemService();
@@ -15,7 +15,9 @@ public save = async (request: Request, response: Response) => {
       category, 
       statusConservation, 
       availability, 
-      size, longitude, latitude} = request.body;
+      size,
+      longitude,
+      latitude} = request.body;
 
       const itemDTO = new ItemDTO(name, description, category, statusConservation, availability, size, longitude, latitude);
       const newItem = await this.itemService.save(itemDTO);
@@ -28,44 +30,54 @@ public save = async (request: Request, response: Response) => {
         }));
     
       await this.itemService.saveImages(images);
-      }
-  
       response.status(201).json(newItem);
+      }
     } catch (error) {
-      console.error("Erro ao salvar item:", error);
-      response.status(500).json({ message: "Erro ao salvar o item." });
+      console.error("Erro ao salvar o item:", error);
+     
     }
   };
   
-  public getAll = async(request:Request, response: Response)=> {
-    try {
-      
-      const items = await this.itemService.getAll();
-      
-      return response.status(200).json(items);
-    } catch (error) {
-
-      console.error("Erro ao buscar itens:", error);
-      response.status(500).json({ message: "Não foi possível buscar os itens." });
+  public getByName = async(request:Request, response:Response)=>{
+    try{
+      const {name}= request.params;
+      const getByName= await this.itemService.getByName(name);
+      if (getByName && getByName.message) {
+        return response.status(404).json({ message: getByName.message});
+      }
+      response.status(200).json(getByName)
+    }catch(error){
+      response.status(404).send(error);
     }
   }
-
+  public getAll = async(request:Request, response: Response)=> {
+    try {
+      const items = await this.itemService.getAll();
+      
+     response.status(200).json(items);
+    } catch (error) {
+      console.error("Erro ao buscar itens:", error);
+      
+    }
+  }
 
   public deleteByName = async (request: Request, response: Response) => {
     try {
       const { name } = request.params; //via url
-
-     
       const deletedItem = await this.itemService.deleteByName(name);
-      response.status(200).json({ message: "Item deletado com sucesso.", deletedItem });  
+      response.status(204).send(deletedItem) //deletou com sucesso, o status 204 não retona conteudo
     } catch (error) {
-      console.error("Erro ao deletar item:", error);
-      response.status(500).json({ message: "Não foi possível deletar o item." });  
+     response.status(404).send(error) //se o item não for encontrado
     }
   };
+
   public deleteAll= async(request: Request, response:Response)=>{
-    const deleteAll= await this.itemService.deleteAll();
-    response.json(deleteAll);
+    try{
+      const deleteAll= await this.itemService.deleteAll();
+      response.status(204).send(deleteAll)
+    }catch(error){
+      response.status(404).send(error);
+    } 
   }
 
   public updateAvailability = async (request: Request, response: Response) => {
@@ -73,18 +85,15 @@ public save = async (request: Request, response: Response) => {
       const { name } = request.params;  
       const { availability } = request.body;  
 
-      
       if (typeof availability !== 'boolean') {
-        return response.status(400).json({ message: "Disponibilidade inválida. Deve ser um valor booleano." });
+         response.status(400).json({ message: "Informe um valor valido para a propriedade 'disponibilidade' " });
       }
-
       const updatedItem = await this.itemService.updateAvailability(name, availability);
 
       if (!updatedItem) {
-        return response.status(404).json({ message: "Item não encontrado." });
+        response.status(404).json({ message: "Item não encontrado." });
       }
-
-      return response.status(200).json(updatedItem);
+      response.status(200).json(updatedItem);
     } catch (error) {
       console.error("Erro ao atualizar disponibilidade do item:", error);
       response.status(500).json({ message: "Erro ao atualizar a disponibilidade." });
@@ -92,16 +101,21 @@ public save = async (request: Request, response: Response) => {
   };
 
   public getBySize = async(request:Request, response:Response)=>{
-    const {size}= request.params;
-    const itensSize= await this.itemService.getBySize(size)
-    return response.json(itensSize);
+    try{
+        const {size}= request.params;
+        const itensSize= await this.itemService.getBySize(size)
+        response.status(200).json(itensSize);
+    }catch(error){
+       response.status(404).send(error);
+    } 
   }
 
   public getByConservation = async (request:Request, response:Response)=>{
-    const {statusConservation}= request.params;
-    const itensConservation= await this.itemService.getByConsevation(statusConservation);
-    return response.json(itensConservation);
-  }
-  
- 
+    try{
+      const {statusConservation}= request.params;
+      const itensConservation= await this.itemService.getByConsevation(statusConservation);
+      response.status(200).json(itensConservation);
+    } catch(error){
+      response.status(404).send(error);
+   }}
 };
