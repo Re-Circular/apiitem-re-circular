@@ -12,9 +12,11 @@ class ItemService {
           description: itemDTO.description,
           category: itemDTO.category,
           statusConservation: itemDTO.statusConservation,
-          availability: itemDTO.availability,
+          availability: itemDTO.availability==="true",
           size: itemDTO.size,
-          
+          longitude: parseFloat(itemDTO.longitude),
+          latitude:parseFloat(itemDTO.latitude),
+        
         },
       });
 
@@ -139,11 +141,6 @@ public getByConsevation = async(statusConservation:StatusConservation) =>{
     }
   };
 
-
-
 }
 
 export default ItemService;
-
-
-//deletar e atualizar imagem de item

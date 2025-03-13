@@ -9,16 +9,19 @@ export default class ItemDTO {
   category: Category;
   statusConservation: StatusConservation;
   availability: boolean;
-  size?: string;
+  latitude: number;
+  longitude: number;
   images: ImageItem[];  
-
+  size: string;
   constructor(
     name: string,
     description: string,
     category: Category,
     statusConservation: StatusConservation,
     availability: boolean,
-    size?: string,
+    size: string,
+    latitude: number,
+    longitude: number,
     images: ImageItem[] = []  
   ) {
     this.name = name;
@@ -27,6 +30,8 @@ export default class ItemDTO {
     this.statusConservation = statusConservation;
     this.availability = availability;
     this.size = size;
+    this.latitude= latitude;
+    this.longitude=longitude;
     this.images = images;
   }
 }

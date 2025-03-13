@@ -14,34 +14,43 @@ model ImageItem {
   updated_at  DateTime @default(now())
 
   itemId String
-  item   Item   @relation(fields: [itemId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  item   Item   @relation(fields: [itemId], references: [id], onDelete: Cascade, onUpdate: Cascade, name: "images_item")
 
   @@map("images_item")
 }
 
 model Item {
-  id               String           @id @default(uuid())
-  name             String
-  description      String
-  category         Category
+  id                 String              @id @default(uuid())
+  name               String
+  description        String
+  category           String
   statusConservation StatusConservation
-  availability     Boolean
-  size             String?
-  createdAt        DateTime         @default(now())
-  updatedAt        DateTime         @updatedAt
+  availability       Boolean
+  size              String?
+  latitude          Float
+  longitude         Float
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
 
-  imageItems       ImageItem[]      @relation("ItemImages")
+  imageItems        ImageItem[]         @relation(name: "images_item")
+  propostas         Proposta[]          @relation(name: "propostas_item")
 
   @@map("Item_table")
 }
 
-enum StatusConservation {
-  Novo
-  Usado
+model Proposta {
+   id           String        @id @default(uuid())
+   descricao    String?
+   dataProposta DateTime      @default(now())
+
+   itemId       String
+   item         Item          @relation(fields: [itemId], references: [id], onDelete: Cascade, onUpdate: Cascade, name: "propostas_item")
+
+   @@map("proposta_table")
 }
 
-enum Category {
-  Eletronico
-  Vestuario
-  Papelaria
+enum StatusConservation {
+  novo
+  seminovo
+  usado
 }

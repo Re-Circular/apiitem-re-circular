@@ -1,22 +1,20 @@
 export enum StatusConservation {
-  Novo = "Novo",
-  Usado = "Usado",
+  novo = "Novo",
+  seminovo= "seminovo",
+  usado = "Usado",
 }
 
-export enum Category {
-  Eletronicos = "Eletronicos",
-  Vestuario = "Vestuário",
-  Papelaria = "Papelaria",
-}
 
 export default interface Item {
   id: string;
   name: string;
   description: string;
-  category: Category;
+  category: String;
   statusConservation: StatusConservation;
   availability: boolean;
   size?: string;
+  latitude: string;
+  longitude:string;
   createdAt: Date;
   updatedAt: Date;
 }

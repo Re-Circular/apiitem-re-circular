@@ -1,4 +1,4 @@
-import { request, Request, Response } from "express";
+import { Request, Response } from "express";
 import ItemService from "../service/itemService";
 import ItemDTO from "../model/dto/itemDTO";
 
@@ -15,9 +15,9 @@ public save = async (request: Request, response: Response) => {
       category, 
       statusConservation, 
       availability, 
-      size} = request.body;
+      size, longitude, latitude} = request.body;
 
-      const itemDTO = new ItemDTO(name, description, category, statusConservation, availability, size);
+      const itemDTO = new ItemDTO(name, description, category, statusConservation, availability, size, longitude, latitude);
       const newItem = await this.itemService.save(itemDTO);
   
       //se o formDate no insominia estiver preenchido com no máximo 5 fotos
@@ -103,6 +103,5 @@ public save = async (request: Request, response: Response) => {
     return response.json(itensConservation);
   }
   
-
  
 };
