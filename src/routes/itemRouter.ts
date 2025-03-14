@@ -14,9 +14,11 @@ router.get("/", itemController.getAll)
 router.get("/:name", itemController.getByName)
 router.delete("/:name", itemController.deleteByName);
 router.delete("/", itemController.deleteAll)
-router.patch("/availability/:name", itemController.updateAvailability);
-router.get("/:size", itemController.getBySize);
+router.patch("/:name", itemController.updateAvailability);
+router.get("/tamanho/:size", itemController.getBySize);
 router.get("/conservacao/:statusConservation", itemController.getByConservation);
+
+
 
 
 export default router;

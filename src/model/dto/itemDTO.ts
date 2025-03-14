@@ -1,12 +1,12 @@
 
 
-import { Category, StatusConservation } from "@prisma/client";
+import { StatusConservation } from "@prisma/client";
 import { ImageItem } from "../IImage";
 
 export default class ItemDTO {
   name: string;
   description: string;
-  category: Category;
+  category: string;
   statusConservation: StatusConservation;
   availability: boolean;
   latitude: number;
@@ -16,7 +16,7 @@ export default class ItemDTO {
   constructor(
     name: string,
     description: string,
-    category: Category,
+    category:string,
     statusConservation: StatusConservation,
     availability: boolean,
     size: string,

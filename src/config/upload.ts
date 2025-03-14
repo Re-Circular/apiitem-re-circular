@@ -3,8 +3,6 @@ import multer from 'multer';
 import { resolve } from 'node:path';
 
 
-
-
 const uploadConfig = (folder: string) =>
   multer({
     storage: multer.diskStorage({

@@ -1,10 +1,7 @@
 import prisma from "../prisma/client";
 import ItemDTO from "../model/dto/itemDTO";
-import { StatusConservation } from "@prisma/client";
-import ExceptionMiddleware from "../../apiusers-re-circular/src/middleware/ExceptionMiddleware";
-import GenericException from "../../apiusers-re-circular/src/model/exceptions/GenericException";
-import { equal } from "node:assert";
-
+import { StatusConservation,  } from "@prisma/client";
+import { geolocation } from "./geolocation";
 
 class ItemService {
   public save = async (itemDTO: ItemDTO) => {
@@ -41,44 +38,51 @@ class ItemService {
       console.log("Não foi possível buscar o item", error); 
     }
   };
-
-
 //filtros
 public getBySize = async (size: string) => {
-  console.log("Buscando itens com tamanho:", size)
+  console.log("Buscando itens com tamanho:", size);
+  
   try {
-    const items = await prisma.item.findMany({
+    const resultItems = await prisma.item.findMany({
       where: {
-        size: size,
+        size: { contains: size,
+           mode: "insensitive" }//faz com que pesquise independete se tem letras maiúsculas ou minúsculas
       },
       include: {
         imageItems: true, 
       },
     });
-
-    if (items.length === 0) {
-      return { message: "Nenhum item encontrado com esse tamanho." };
+    
+    console.log("Result",resultItems)
+    if (resultItems.length === 0) {
+      return { message: "Nenhum item encontrado com esse tamanho.", size};
     }
-    return items;
+    return resultItems;
   } catch (error) {
     console.error("Erro ao buscar itens por tamanho:", error);
   }
 };
 
-public getByConsevation = async(statusConservation:StatusConservation) =>{
+//public getByLocation = async()
+
+public getByConservation = async(statusConservation:StatusConservation) =>{
   console.log("Buscando itens com o estado de conservação:", StatusConservation)
   try {
     const items = await prisma.item.findMany({
       where: {
-        statusConservation:statusConservation,
+        
+       statusConservation:statusConservation
       },
       include: {
         imageItems: true, 
       },
     });
-
+console.log(items)
     if (items.length == 0) {
       return { message: "Nenhum item encontrado." };
+    }
+    else if(!statusConservation){
+      return {message: "Estado de conservação não compativel"}
     }
     return items;
   } catch (error) {
@@ -174,6 +178,7 @@ public saveImages = async (images: { pictureName: string; itemId: string }[]) =>
       console.error("Erro ao salvar imagens:", error);  
     }
   };
+
 
 }
 
